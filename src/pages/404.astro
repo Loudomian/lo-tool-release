@@ -1,0 +1,15 @@
+---
+import Base from '../layouts/Base.astro'
+import { href } from '../lib/site'
+---
+
+<Base title="页面不存在 — LO 工具集">
+  <section class="shell not-found">
+    <p class="eyebrow">404 / NOT FOUND</p>
+    <h1>这里还没有工具。</h1>
+    <p>地址可能发生了变化，回工具库看看吧。</p>
+    <a href={href()} class="button primary">
+      返回工具库 →
+    </a>
+  </section>
+</Base>

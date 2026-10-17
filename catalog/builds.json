@@ -1,0 +1,18 @@
+[
+  {
+    "id": "df-assembly-tool",
+    "name": "三角洲配装",
+    "description": "读取原始模型与挂点，预览、组合武器配件，一键导出带材质和统一骨架的 Blender 配装包。",
+    "build": {
+      "enabled": true,
+      "repository": "Loudomian/df-assembly-tool",
+      "sourceTagPrefix": "v",
+      "artifacts": [
+        {
+          "filename": "df-assembly-tool-{version}-windows-x64.zip",
+          "platform": "Windows x64"
+        }
+      ]
+    }
+  }
+]

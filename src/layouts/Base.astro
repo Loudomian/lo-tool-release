@@ -1,0 +1,83 @@
+---
+import '../styles/global.css'
+import { href } from '../lib/site'
+import { hubRepository } from '../lib/catalog'
+import Icon from '../components/Icon.astro'
+interface Props {
+  title?: string
+  description?: string
+}
+const {
+  title = 'LO 工具集 — 为创作留出更多时间',
+  description = '从日常工作出发，做一些顺手的工具。',
+} = Astro.props
+---
+
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#181817" />
+    <meta name="color-scheme" content="dark" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <link rel="icon" type="image/svg+xml" href={href('favicon.svg')} />
+    <title>{title}</title>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">
+      跳到主要内容
+    </a>
+    <header class="site-header">
+      <div class="shell header-inner">
+        <a href={href()} class="brand" aria-label="LO 工具集首页">
+          LO<span class="brand-divider">/</span>TOOLS
+        </a>
+        <a
+          class="text-link header-github"
+          href={`https://github.com/${hubRepository}`}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          GitHub <Icon name="external" size={16} />
+        </a>
+      </div>
+    </header>
+    <main id="main">
+      <slot />
+    </main>
+    <footer class="site-footer">
+      <div class="shell footer-inner">
+        <p class="copyright">
+          © <span data-current-year>{new Date().getFullYear()}</span> Loudomian
+        </p>
+        <nav class="footer-links" aria-label="页脚链接">
+          <a
+            href={`https://github.com/${hubRepository}/releases`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            所有版本 <Icon name="external" size={16} />
+          </a>
+          <a
+            href={`https://github.com/${hubRepository}/issues`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            问题反馈 <Icon name="external" size={16} />
+          </a>
+        </nav>
+      </div>
+    </footer>
+    <script>
+      import { initMotion } from '../scripts/motion'
+      const year = document.querySelector('[data-current-year]')
+      if (year) year.textContent = String(new Date().getFullYear())
+      const dispose = initMotion()
+      if (import.meta.hot) import.meta.hot.dispose(dispose)
+    </script>
+  </body>
+</html>

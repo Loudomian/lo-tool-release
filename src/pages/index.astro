@@ -1,0 +1,79 @@
+---
+import Base from '../layouts/Base.astro'
+import Icon from '../components/Icon.astro'
+import { catalog, displayTools, hubRepository } from '../lib/catalog'
+import { renderTools } from '../lib/release-view'
+const entries = displayTools(catalog)
+---
+
+<Base>
+  <section class="home-intro shell">
+    <h1>
+      <span class="title-mask">
+        <span data-title-line>把繁琐交给工具，</span>
+      </span>
+      <span class="title-mask">
+        <span data-title-line>把时间留给创作。</span>
+      </span>
+    </h1>
+    <div class="intro-copy">
+      <p data-intro>
+        从日常工作出发，
+        <br />
+        做一些顺手的工具。
+      </p>
+    </div>
+  </section>
+
+  <section
+    id="tools"
+    class="tool-library shell"
+    aria-labelledby="downloads-title"
+  >
+    <div class="section-heading">
+      <h2 id="downloads-title">工具</h2>
+      <label class="search-box" hidden={entries.length < 4}>
+        <Icon name="search" size={17} />
+        <input
+          type="search"
+          id="tool-search"
+          aria-label="搜索工具"
+          placeholder="搜索工具…"
+        />
+      </label>
+    </div>
+    <div
+      id="release-list"
+      class="tool-list"
+      aria-busy="false"
+      set:html={renderTools(catalog)}
+    />
+    <div class="catalog-empty" id="catalog-empty" hidden={entries.length > 0}>
+      <p>还没有发布版本。</p>
+      <span>工具发布后，会在这里提供下载。</span>
+    </div>
+    <p class="search-empty" id="search-empty" hidden>
+      没有找到相关工具。
+    </p>
+    <div class="catalog-status">
+      <p id="release-status" role="status" aria-live="polite"></p>
+      <button class="text-button" id="release-retry" type="button" hidden>
+        重试
+      </button>
+    </div>
+    <a
+      class="text-link all-releases"
+      href={`https://github.com/${hubRepository}/releases`}
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      GitHub Releases <Icon name="external" size={16} />
+    </a>
+  </section>
+</Base>
+
+<script>
+  import { initReleaseList } from '../scripts/releases'
+  const dispose = initReleaseList()
+  if (import.meta.hot) import.meta.hot.dispose(dispose)
+</script>

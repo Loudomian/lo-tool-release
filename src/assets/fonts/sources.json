@@ -1,0 +1,24 @@
+[
+  {
+    "family": "思源黑体",
+    "upstream": "SourceHanSansCN",
+    "version": "2.005R",
+    "commit": "a4f7cf94edfb9d7ffbdfc4841de276358bd7e0f2",
+    "originalSHA256": "7087698d52240614659957608d8c4ad446759aee3208409dc9f566412e7af8f4",
+    "weight": 600,
+    "codepoints": 30926,
+    "subsets": 61,
+    "license": "OFL-1.1"
+  },
+  {
+    "family": "思源宋体",
+    "upstream": "SourceHanSerifCN",
+    "version": "2.003R",
+    "commit": "7889f11bf31170b5d092a083b357c8c8130f89e0",
+    "originalSHA256": "808cb3203bb9cdd6b166a8a656a0c7608a7dc2a31c41c2cd0374550cae445471",
+    "weight": 400,
+    "codepoints": 30930,
+    "subsets": 61,
+    "license": "OFL-1.1"
+  }
+]

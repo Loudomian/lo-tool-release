@@ -1,0 +1,28 @@
+---
+interface Props {
+  name: 'external' | 'search'
+  size?: number
+  class?: string
+}
+const { name, size = 20, class: className } = Astro.props
+const paths = {
+  external: 'M7 17 17 7M7 7h10v10',
+  search: 'M20 20l-5-5M17 10a7 7 0 1 1-14 0 7 7 0 0 1 14 0',
+}
+---
+
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  width={size}
+  height={size}
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="1.6"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  class={className}
+  aria-hidden="true"
+>
+  <path d={paths[name]} />
+</svg>
