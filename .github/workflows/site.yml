@@ -7,7 +7,7 @@ on:
   release:
     types: [published, edited, deleted, unpublished]
   workflow_run:
-    workflows: ['Release - DF Assembly']
+    workflows: ['Release']
     types: [completed]
 permissions:
   contents: read

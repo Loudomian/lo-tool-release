@@ -1,0 +1,84 @@
+name: Release
+
+on:
+  repository_dispatch:
+    types: [release]
+  workflow_dispatch:
+    inputs:
+      tool:
+        description: Registered tool ID
+        required: true
+        type: string
+      tag:
+        description: Existing source tag, for example v1.2.0-rc.1
+        required: true
+        type: string
+      sha:
+        description: Optional full source commit SHA
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.event.client_payload.tool || inputs.tool || github.ref_name }}-${{ github.event.client_payload.tag || inputs.tag || github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  resolve:
+    runs-on: ubuntu-latest
+    outputs:
+      tool: ${{ steps.source.outputs.tool }}
+      version: ${{ steps.source.outputs.version }}
+      source_repository: ${{ steps.source.outputs.source_repository }}
+      source_tag: ${{ steps.source.outputs.source_tag }}
+      source_sha: ${{ steps.source.outputs.source_sha }}
+      runner: ${{ steps.source.outputs.runner }}
+      artifact_paths: ${{ steps.source.outputs.artifact_paths }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6
+        with:
+          bun-version-file: package.json
+      - run: bun install --frozen-lockfile
+      - name: Validate the registered tool, source tag and immutable commit
+        id: source
+        run: bun scripts/release-request.ts
+        env:
+          SOURCE_TOKEN: ${{ secrets.SOURCE_TOKEN }}
+
+  build:
+    needs: resolve
+    runs-on: ${{ needs.resolve.outputs.runner }}
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          repository: ${{ needs.resolve.outputs.source_repository }}
+          ref: ${{ needs.resolve.outputs.source_sha }}
+          token: ${{ secrets.SOURCE_TOKEN }}
+          persist-credentials: false
+      - name: Run the build recipe from the pinned source commit
+        uses: ./.github/actions/build-release
+        with:
+          version: ${{ needs.resolve.outputs.version }}
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        with:
+          name: tool-release-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ needs.resolve.outputs.artifact_paths }}
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 7
+
+  publish:
+    needs: [resolve, build]
+    permissions:
+      contents: write
+    uses: ./.github/workflows/publish.yml
+    with:
+      tool: ${{ needs.resolve.outputs.tool }}
+      source_tag: ${{ needs.resolve.outputs.source_tag }}
+      source_sha: ${{ needs.resolve.outputs.source_sha }}
+      artifact: tool-release-${{ github.run_id }}-${{ github.run_attempt }}

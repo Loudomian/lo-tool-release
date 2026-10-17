@@ -6,6 +6,7 @@ import { createHash } from 'node:crypto'
 import assert from 'node:assert/strict'
 import { releaseRequest, resolveSourceTag } from '../scripts/release-request'
 import { verifyArchives } from '../scripts/publish-release'
+import { tools } from '../scripts/build-tools'
 
 test('release requests only accept known tools, version tags and complete immutable commit IDs', () => {
   const request = releaseRequest({
@@ -23,6 +24,108 @@ test('release requests only accept known tools, version tags and complete immuta
     { tool: 'df-assembly-tool', tag: 'v1.0.0', sha: 'HEAD' },
   ])
     expect(() => releaseRequest(input)).toThrow()
+})
+
+test('build requests select a registered runner and exact artifact paths, never arbitrary upload globs', () => {
+  const base = tools[0]!
+  const request = releaseRequest({ tool: base.id, tag: 'v1.2.0+build.1' })
+  expect(request.runner).toBe('windows-2025')
+  expect(request.artifactPaths).toEqual([
+    'dist/df-assembly-tool-1.2.0+build.1-windows-x64.zip',
+    'dist/df-assembly-tool-1.2.0+build.1-windows-x64.zip.sha256',
+  ])
+  const another = {
+    ...base,
+    id: 'another-tool',
+    build: {
+      ...base.build,
+      runner: 'ubuntu-latest',
+      artifacts: [
+        { filename: 'another-{version}-linux-x64.zip', platform: 'Linux x64' },
+      ],
+    },
+  }
+  expect(
+    releaseRequest({ tool: another.id, tag: 'v2.0.0' }, [another])
+      .artifactPaths,
+  ).toEqual([
+    'dist/another-2.0.0-linux-x64.zip',
+    'dist/another-2.0.0-linux-x64.zip.sha256',
+  ])
+  for (const filename of [
+    '../source.zip',
+    '*.zip',
+    'source\nprivate.zip',
+    '/tmp/private.zip',
+  ])
+    expect(() =>
+      releaseRequest({ tool: base.id, tag: 'v1.2.0' }, [
+        {
+          ...base,
+          build: {
+            ...base.build,
+            artifacts: [{ filename, platform: 'Windows' }],
+          },
+        },
+      ]),
+    ).toThrow('交付文件名')
+  expect(() =>
+    releaseRequest({ tool: base.id, tag: 'v1.2.0' }, [
+      { ...base, build: { ...base.build, runner: 'self-hosted' } },
+    ]),
+  ).toThrow('Runner')
+})
+
+test('the resolver CLI writes a complete immutable request and multiline upload paths for Actions', async () => {
+  const folder = await mkdtemp(join(tmpdir(), 'lo-release-resolver-'))
+  try {
+    const event = join(folder, 'event.json')
+    const output = join(folder, 'outputs.txt')
+    const preload = join(folder, 'github-fixture.ts')
+    await Bun.write(
+      event,
+      JSON.stringify({
+        client_payload: {
+          tool: 'df-assembly-tool',
+          tag: 'v1.2.0',
+          sha: 'a'.repeat(40),
+        },
+      }),
+    )
+    await Bun.write(
+      preload,
+      `globalThis.fetch = async () => Response.json({ object: { type: 'commit', sha: '${'a'.repeat(40)}' } });`,
+    )
+    const child = Bun.spawn(
+      [process.execPath, '--preload', preload, 'scripts/release-request.ts'],
+      {
+        cwd: join(import.meta.dir, '..'),
+        env: {
+          ...process.env,
+          GITHUB_EVENT_PATH: event,
+          GITHUB_OUTPUT: output,
+          SOURCE_TOKEN: 'fixture-only-not-a-real-token',
+        },
+        stdout: 'pipe',
+        stderr: 'pipe',
+      },
+    )
+    const [code, _stdout, stderr] = await Promise.all([
+      child.exited,
+      new Response(child.stdout).text(),
+      new Response(child.stderr).text(),
+    ])
+    expect(stderr).toBe('')
+    expect(code).toBe(0)
+    const text = await Bun.file(output).text()
+    expect(text).toContain(`source_sha=${'a'.repeat(40)}\n`)
+    expect(text).toContain('runner=windows-2025\n')
+    expect(text).toContain(
+      'artifact_paths<<LO_ARTIFACT_PATHS\ndist/df-assembly-tool-1.2.0-windows-x64.zip\ndist/df-assembly-tool-1.2.0-windows-x64.zip.sha256\nLO_ARTIFACT_PATHS\n',
+    )
+  } finally {
+    await rm(folder, { recursive: true, force: true })
+  }
 })
 test('release archives must match both checksum and filename and contain no extra files', async () => {
   const folder = await mkdtemp(join(tmpdir(), 'lo-release-'))

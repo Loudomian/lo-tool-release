@@ -29,4 +29,8 @@ Publish releases with tags such as `tool-name/v1.0.0`. The site automatically gr
 
 Use `Tool Name v1.0.0` as the release title and put a short description in the first paragraph of the release notes.
 
-Build configuration lives in `catalog/builds.json` and `.github/workflows/`. GitHub Actions builds and deploys the site to GitHub Pages.
+For automated builds, register the source repository, runner, and ZIP filenames in `catalog/builds.json`. Each source repository provides a `.github/actions/build-release` composite action accepting a `version` input.
+
+Source publish commands push a tag and send `repository_dispatch` (`event_type: release`, payload: `tool`, `tag`, `sha`) using the local GitHub CLI login. The public `Release` workflow reads the pinned source with the `SOURCE_TOKEN` secret, builds, and publishes. It can also be started manually with an existing source tag.
+
+The `Site` workflow automatically deploys the download site to GitHub Pages.

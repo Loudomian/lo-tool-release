@@ -7,6 +7,7 @@
       "enabled": true,
       "repository": "Loudomian/df-assembly-tool",
       "sourceTagPrefix": "v",
+      "runner": "windows-2025",
       "artifacts": [
         {
           "filename": "df-assembly-tool-{version}-windows-x64.zip",

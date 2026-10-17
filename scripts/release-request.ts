@@ -8,6 +8,8 @@ export interface ReleaseRequest {
   sourceTag: string
   sourceSha?: string
   releaseTag: string
+  runner: string
+  artifactPaths: string[]
 }
 export function releaseRequest(
   input: { tool?: unknown; tag?: unknown; sha?: unknown },
@@ -25,11 +27,31 @@ export function releaseRequest(
   if (!tag.startsWith(tool.build.sourceTagPrefix))
     throw new Error('需要源码版本标签')
   const version = tag.slice(tool.build.sourceTagPrefix.length)
-  if (version.length > 100 || semver.valid(version) !== version)
+  const parsedVersion = semver.parse(version)
+  const canonicalVersion =
+    parsedVersion &&
+    parsedVersion.version +
+      (parsedVersion.build.length ? '+' + parsedVersion.build.join('.') : '')
+  if (version.length > 100 || canonicalVersion !== version)
     throw new Error('版本标签不是有效的 SemVer')
   const sha = input.sha ? String(input.sha) : undefined
   if (sha && !/^[a-f0-9]{40}$/i.test(sha))
     throw new Error('源码 SHA 必须是完整的 40 位提交标识')
+  if (
+    !['windows-2025', 'ubuntu-latest', 'macos-latest'].includes(
+      tool.build.runner,
+    )
+  )
+    throw new Error('构建 Runner 未登记或不受支持')
+  const names = tool.build.artifacts.map((artifact) =>
+    artifact.filename.replaceAll('{version}', version),
+  )
+  if (
+    !names.length ||
+    new Set(names).size !== names.length ||
+    names.some((name) => !/^[a-zA-Z0-9][a-zA-Z0-9._+-]*\.zip$/.test(name))
+  )
+    throw new Error('交付文件名必须是无路径和通配符的 ZIP 名称')
   return {
     tool: tool.id,
     version,
@@ -37,6 +59,11 @@ export function releaseRequest(
     sourceTag: tag,
     sourceSha: sha?.toLowerCase(),
     releaseTag: `${tool.id}/v${version}`,
+    runner: tool.build.runner,
+    artifactPaths: names.flatMap((name) => [
+      `dist/${name}`,
+      `dist/${name}.sha256`,
+    ]),
   }
 }
 export async function resolveSourceTag(
@@ -75,16 +102,11 @@ if (import.meta.main) {
     ? await Bun.file(process.env.GITHUB_EVENT_PATH).json()
     : {}
   const payload = event.client_payload || event.inputs || {}
-  let tool = payload.tool || process.env.RELEASE_TOOL
-  let tag = payload.tag
-  if (process.env.GITHUB_REF_TYPE === 'tag') {
-    const publicTag = process.env.GITHUB_REF_NAME || ''
-    const match = tools.find((tool) => publicTag.startsWith(`${tool.id}/v`))
-    if (!match) throw new Error('公共标签不属于已登记工具')
-    tool = match.id
-    tag = match.build.sourceTagPrefix + publicTag.slice(`${match.id}/v`.length)
-  }
-  const request = releaseRequest({ tool, tag, sha: payload.sha })
+  const request = releaseRequest({
+    tool: payload.tool,
+    tag: payload.tag,
+    sha: payload.sha,
+  })
   const token = process.env.SOURCE_TOKEN
   if (!token)
     throw new Error(
@@ -100,6 +122,7 @@ if (import.meta.main) {
     source_tag: resolved.sourceTag,
     source_sha: resolved.sourceSha!,
     release_tag: resolved.releaseTag,
+    runner: resolved.runner,
   }
   await Bun.write(
     Bun.file(process.env.GITHUB_OUTPUT),
@@ -108,7 +131,8 @@ if (import.meta.main) {
       .catch(() => '')) +
       Object.entries(outputs)
         .map(([key, value]) => `${key}=${value}\n`)
-        .join(''),
+        .join('') +
+      `artifact_paths<<LO_ARTIFACT_PATHS\n${resolved.artifactPaths.join('\n')}\nLO_ARTIFACT_PATHS\n`,
   )
   console.log(`${resolved.tool} ${resolved.sourceTag} → ${resolved.sourceSha}`)
 }
