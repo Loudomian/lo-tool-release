@@ -43,9 +43,6 @@ function downloads(release: Release) {
 export function renderTools(data: Snapshot) {
   return displayTools(data)
     .map((tool) => {
-      const other = tool.releases.filter(
-        (release) => release.id !== tool.release.id,
-      )
       const platforms = [
         ...new Set(
           tool.release.assets
@@ -63,7 +60,6 @@ export function renderTools(data: Snapshot) {
       </div>
       <div class="tool-downloads">${downloads(tool.release)}
         <a class="text-link release-notes" href="${escape(tool.release.url)}" ${external}>版本说明 ↗</a>
-        ${other.length ? `<details class="version-history"><summary>其他版本</summary><div class="history-list">${other.map((release) => `<section class="history-release"><h3><a href="${escape(release.url)}" ${external}>v${escape(release.version)} ↗</a>${release.prerelease ? '<span class="release-badge">预发布</span>' : ''}</h3><time datetime="${escape(release.publishedAt)}">${formatDate(release.publishedAt)}</time>${downloads(release)}</section>`).join('')}</div></details>` : ''}
       </div>
     </article>`
     })

@@ -223,8 +223,7 @@ summary {
 .release-meta .release-badge {
   margin-left: 8px;
 }
-.release-meta time,
-.history-release > time {
+.release-meta time {
   color: var(--ink);
   font: 600 13px var(--sans);
 }
@@ -323,41 +322,12 @@ summary {
 .support-files .download-file {
   padding-block: 14px;
 }
-.version-history {
-  margin-top: 24px;
-  border-top: 1px solid var(--line);
-  padding-top: 17px;
-}
-.version-history > summary {
-  font-size: 13px;
-}
 summary {
   width: fit-content;
 }
 summary::marker {
   color: var(--muted);
   font-size: 10px;
-}
-.history-release {
-  padding-block: 22px;
-  border-bottom: 1px solid var(--line);
-}
-.history-release:last-child {
-  border-bottom: 0;
-  padding-bottom: 0;
-}
-.history-release h3 {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 12px;
-  font-size: 14px;
-  font-weight: 600;
-  margin: 0 0 8px;
-}
-.history-release > time {
-  display: block;
-  margin-bottom: 14px;
 }
 .no-files {
   color: var(--muted);

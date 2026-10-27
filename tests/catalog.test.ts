@@ -101,7 +101,7 @@ test('drafts, duplicates, non-tool tags and unsafe or mismatched release URLs ar
   expect(releaseIdentity('../bad/v1.0.0')).toBeNull()
   expect(releaseIdentity('tool/v1.0.0\n')).toBeNull()
 })
-test('release text is escaped, supporting files are secondary and history stays within its tool', () => {
+test('release text is escaped, supporting files are secondary and cards show only the latest release', () => {
   const data = discoverReleases([
     row('one/v1.0.0', 1, {
       name: '<img src=x onerror=alert(1)> v1.0.0',
@@ -127,7 +127,10 @@ test('release text is escaped, supporting files are secondary and history stays 
   expect(html).not.toContain('<script>')
   expect(html).toContain('&lt;img')
   expect(html).toContain('<summary>校验与发布清单</summary>')
-  expect(html.match(/<summary>其他版本<\/summary>/g)).toHaveLength(1)
+  expect(html).not.toContain('其他版本')
+  expect(html).not.toContain('v0.9.0')
+  expect(html).toContain('releases/tag/one%2Fv1.0.0')
+  expect(html).toContain('releases/tag/two%2Fv8.0.0')
   expect(html).toContain('Windows · x64')
   expect(renderTools(discoverReleases([]))).toBe('')
 })
