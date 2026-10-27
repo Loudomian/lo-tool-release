@@ -34,3 +34,5 @@ For automated builds, register the source repository, runner, and ZIP filenames 
 Source publish commands push a tag and send `repository_dispatch` (`event_type: release`, payload: `tool`, `tag`, `sha`) using the local GitHub CLI login. The public `Release` workflow reads the pinned source with the `SOURCE_TOKEN` secret, builds, and publishes. It can also be started manually with an existing source tag.
 
 The `Site` workflow automatically deploys the download site to GitHub Pages.
+
+Release publication, edits and removal use `Refresh site` to dispatch `Site` on the default branch. Release tags never deploy directly to the protected `github-pages` environment. Completed tool builds also refresh the site through `workflow_run`; failed builds do not deploy.

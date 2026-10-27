@@ -1,0 +1,22 @@
+name: Refresh site
+
+on:
+  release:
+    types: [published, edited, deleted, unpublished]
+
+permissions:
+  contents: read
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+    steps:
+      # Changing checkout.ref cannot change a release event's deployment ref.
+      # Dispatch Site on the default branch so Pages' branch policy still applies.
+      - name: Rebuild the current site from the default branch
+        env:
+          GH_TOKEN: ${{ github.token }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        run: gh workflow run site.yml --repo "$GITHUB_REPOSITORY" --ref "$DEFAULT_BRANCH"
