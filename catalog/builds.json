@@ -1,7 +1,7 @@
 [
   {
     "id": "df-assembly-tool",
-    "name": "三角洲配装",
+    "name": "DF配装",
     "description": "读取原始模型与挂点，预览、组合武器配件，一键导出带材质和统一骨架的 Blender 配装包。",
     "build": {
       "enabled": true,
