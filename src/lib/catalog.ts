@@ -167,14 +167,6 @@ export const formatDate = (date: string) =>
     month: '2-digit',
     day: '2-digit',
   }).format(new Date(date))
-export const summary = (body: string, max = 180) =>
-  body
-    .replace(/<!--[^]*?-->/g, '')
-    .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1')
-    .replace(/[#*`>]/g, '')
-    .replace(/\s+/g, ' ')
-    .trim()
-    .slice(0, max)
 export function platformLabel(name: string) {
   if (/sha256|checksums/i.test(name)) return 'SHA256 校验'
   if (/release\.json/i.test(name)) return '发布清单'

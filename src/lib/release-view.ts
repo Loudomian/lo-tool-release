@@ -4,7 +4,6 @@ import {
   formatSize,
   isSupportAsset,
   platformLabel,
-  summary,
   type Release,
   type ReleaseAsset,
   type Snapshot,
@@ -47,9 +46,6 @@ export function renderTools(data: Snapshot) {
       const other = tool.releases.filter(
         (release) => release.id !== tool.release.id,
       )
-      const description = summary(
-        tool.release.body.split(/\r?\n\s*\r?\n/)[0] || '',
-      )
       const platforms = [
         ...new Set(
           tool.release.assets
@@ -58,7 +54,7 @@ export function renderTools(data: Snapshot) {
         ),
       ].join('、')
       return `<article class="tool-entry" id="${escape(tool.id)}" data-tool-card data-search="${escape(`${tool.id} ${tool.name}`.toLocaleLowerCase())}">
-      <div class="tool-info"><div class="card-intro"><h2>${escape(tool.name)}</h2>${description ? `<p class="tool-description">${escape(description)}</p>` : ''}</div>
+      <div class="tool-info"><h2>${escape(tool.name)}</h2>
         <dl class="release-meta">
           <div><dt>版本</dt><dd>v${escape(tool.release.version)}${tool.release.prerelease ? '<span class="release-badge">预发布</span>' : ''}</dd></div>
           <div><dt>更新</dt><dd><time datetime="${escape(tool.release.publishedAt)}">${formatDate(tool.release.publishedAt)}</time></dd></div>
