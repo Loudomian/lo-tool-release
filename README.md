@@ -35,4 +35,6 @@ Source publish commands push a tag and send `repository_dispatch` (`event_type: 
 
 The `Site` workflow automatically deploys the download site to GitHub Pages.
 
-Release publication, edits and removal use `Refresh site` to dispatch `Site` on the default branch. Release tags never deploy directly to the protected `github-pages` environment. Completed tool builds also refresh the site through `workflow_run`; failed builds do not deploy.
+The active workflow is `.github/workflows/pages.yml`. It deploys main-branch pushes, manual runs and successful tool builds (`workflow_run`). Failed builds and pull requests do not deploy. The browser reads Releases on page load, so editing or removing a release updates the displayed catalogue without a deployment.
+
+The previous `site.yml` workflow is disabled in GitHub Actions: historical release tags still contain its old release trigger, and changing main cannot change those tagged definitions. Keep that old workflow ID disabled; use `Site` / `pages.yml` for manual rebuilds. The `github-pages` environment continues to permit only the `main` branch.

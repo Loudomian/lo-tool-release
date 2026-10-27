@@ -1,4 +1,6 @@
 name: Site
+# This file replaces the retired site.yml workflow. Old release tags retain
+# that workflow, whose ID is disabled so they cannot deploy or cancel Pages.
 on:
   push:
     branches: [main]
