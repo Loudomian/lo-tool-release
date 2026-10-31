@@ -1,7 +1,7 @@
 [
   {
     "id": "df-assembly-tool",
-    "name": "DF配装",
+    "name": "G-Wolf Toolkit · 绿狼工具箱",
     "description": "读取原始模型与挂点，预览、组合武器配件，一键导出带材质和统一骨架的 Blender 配装包。",
     "build": {
       "enabled": true,
