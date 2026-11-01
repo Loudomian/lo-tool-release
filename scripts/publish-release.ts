@@ -73,7 +73,8 @@ if (import.meta.main) {
     resolve(folder, 'release.json'),
     JSON.stringify(manifest, null, 2) + '\n',
   )
-  const notes = `${tool.description}\n\n- 平台：${tool.build.artifacts.map((artifact) => artifact.platform).join('、')}\n- 源码标签：\`${request.sourceTag}\`\n- 源码提交：\`${request.sourceSha}\`\n\n完整解压 ZIP 后使用；SHA256 校验文件和构建来源清单随版本提供。\n`
+  const changelog = Bun.file(resolve(import.meta.dir, '../notes', tool.id, `${request.version}.md`))
+  const notes = ((await changelog.exists()) ? await changelog.text() : tool.description).trim() + '\n'
   const notesPath = resolve(
     process.env.RUNNER_TEMP || folder,
     'lo-release-notes.md',

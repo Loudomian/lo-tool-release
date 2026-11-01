@@ -31,8 +31,8 @@ test('build requests select a registered runner and exact artifact paths, never 
   const request = releaseRequest({ tool: base.id, tag: 'v1.2.0+build.1' })
   expect(request.runner).toBe('windows-2025')
   expect(request.artifactPaths).toEqual([
-    'dist/df-assembly-tool-1.2.0+build.1-windows-x64.zip',
-    'dist/df-assembly-tool-1.2.0+build.1-windows-x64.zip.sha256',
+    'dist/g-wolf-toolkit-1.2.0+build.1-windows-x64.zip',
+    'dist/g-wolf-toolkit-1.2.0+build.1-windows-x64.zip.sha256',
   ])
   const another = {
     ...base,
@@ -121,7 +121,7 @@ test('the resolver CLI writes a complete immutable request and multiline upload 
     expect(text).toContain(`source_sha=${'a'.repeat(40)}\n`)
     expect(text).toContain('runner=windows-2025\n')
     expect(text).toContain(
-      'artifact_paths<<LO_ARTIFACT_PATHS\ndist/df-assembly-tool-1.2.0-windows-x64.zip\ndist/df-assembly-tool-1.2.0-windows-x64.zip.sha256\nLO_ARTIFACT_PATHS\n',
+      'artifact_paths<<LO_ARTIFACT_PATHS\ndist/g-wolf-toolkit-1.2.0-windows-x64.zip\ndist/g-wolf-toolkit-1.2.0-windows-x64.zip.sha256\nLO_ARTIFACT_PATHS\n',
     )
   } finally {
     await rm(folder, { recursive: true, force: true })

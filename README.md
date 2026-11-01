@@ -27,7 +27,7 @@ Build output: `dist/`. Use `bun run build` to build without running checks.
 
 Publish releases with tags such as `tool-name/v1.0.0`. The site automatically groups releases by tool and lists their download assets.
 
-Use `Tool Name v1.0.0` as the release title and put a short description in the first paragraph of the release notes.
+Use `Tool Name v1.0.0` as the release title. Put concise user-facing changes in `notes/<tool-id>/<version>.md`; publishing uses that file, or the registered description when no changelog exists. Keep installation instructions in the packaged README. Release bodies do not append build metadata or source identifiers.
 
 For automated builds, register the source repository, runner, and ZIP filenames in `catalog/builds.json`. Each source repository provides a `.github/actions/build-release` composite action accepting a `version` input.
 
