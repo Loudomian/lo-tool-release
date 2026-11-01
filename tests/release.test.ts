@@ -15,7 +15,7 @@ test('release requests only accept known tools, version tags and complete immuta
     sha: 'a'.repeat(40),
   })
   expect(request.releaseTag).toBe('g-wolf-toolkit/v1.2.0-rc.10')
-  expect(request.sourceRepository).toBe('Loudomian/df-assembly-tool')
+  expect(request.sourceRepository).toBe('Loudomian/g-wolf-toolkit')
   for (const input of [
     { tool: 'unknown', tag: 'v1.0.0' },
     { tool: 'df-assembly-tool', tag: 'main' },
