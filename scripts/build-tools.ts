@@ -3,6 +3,7 @@ import registry from '../catalog/builds.json'
 // Explicit build permissions are separate from automatic public release discovery.
 export interface BuildTool {
   id: string
+  aliases?: string[]
   name: string
   description: string
   build: {

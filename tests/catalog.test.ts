@@ -31,6 +31,21 @@ function row(tag: string, id: number, extra = {}) {
     ...extra,
   }
 }
+
+test('renamed tool tags share one card and prefer canonical assets regardless of input order', () => {
+  const legacy = row('df-assembly-tool/v0.1.20', 1)
+  const current = row('g-wolf-toolkit/v0.1.20', 2)
+  for (const input of [
+    [legacy, current],
+    [current, legacy],
+  ]) {
+    const data = discoverReleases(input)
+    expect(Object.keys(data.tools)).toEqual(['g-wolf-toolkit'])
+    const displayed = displayTools(data)
+    expect(displayed).toHaveLength(1)
+    expect(displayed[0]!.release.tag).toBe('g-wolf-toolkit/v0.1.20')
+  }
+})
 test('new tools appear from tags without a registry and each tool prefers its own stable release', () => {
   const data = discoverReleases([
     row('new-tool/v2.0.0-rc.9', 1),

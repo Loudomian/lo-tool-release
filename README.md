@@ -31,6 +31,8 @@ Use `Tool Name v1.0.0` as the release title. Put concise user-facing changes in 
 
 For automated builds, register the source repository, runner, and ZIP filenames in `catalog/builds.json`. Each source repository provides a `.github/actions/build-release` composite action accepting a `version` input.
 
+G-Wolf Toolkit uses `g-wolf-toolkit/v...` tags. The `df-assembly-tool` identifier is retained as a registry alias for historical build requests and catalogue grouping; old releases and links remain valid. Version 0.1.20 also has a one-time `df-assembly-tool/v0.1.20` upgrade entry with the same checked ZIP for clients whose updater only recognises the old prefix. It is not marked latest; future builds publish only the canonical tag. Keep both prefixes grouped on the site and prefer canonical assets for the same version.
+
 Source publish commands push a tag and send `repository_dispatch` (`event_type: release`, payload: `tool`, `tag`, `sha`) using the local GitHub CLI login. The public `Release` workflow reads the pinned source with the `SOURCE_TOKEN` secret, builds, and publishes. It can also be started manually with an existing source tag.
 
 The `Site` workflow automatically deploys the download site to GitHub Pages.

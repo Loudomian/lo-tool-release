@@ -1,5 +1,6 @@
 import semver from 'semver'
 import snapshot from '../../catalog/releases.json'
+import builds from '../../catalog/builds.json'
 
 export interface ReleaseAsset {
   name: string
@@ -24,6 +25,13 @@ export interface Snapshot {
 export const hubRepository = 'Loudomian/lo-tool-release'
 export const catalog = snapshot as Snapshot
 
+function canonicalToolId(id: string) {
+  return (
+    builds.find((tool) => tool.id === id || tool.aliases?.includes(id))?.id ||
+    id
+  )
+}
+
 export function releaseIdentity(tag: string) {
   const match = /^([a-z0-9]+(?:-[a-z0-9]+)*)\/v(.+)$/.exec(tag)
   if (!match) return null
@@ -37,7 +45,12 @@ export function releaseIdentity(tag: string) {
 export function sortedReleases(values: Release[]) {
   return values
     .filter((release) => !!semver.valid(release.version))
-    .toSorted((a, b) => semver.rcompare(a.version, b.version))
+    .toSorted(
+      (a, b) =>
+        semver.rcompare(a.version, b.version) ||
+        Number(b.tag.startsWith(canonicalToolId(b.tag.split('/')[0]!) + '/')) -
+          Number(a.tag.startsWith(canonicalToolId(a.tag.split('/')[0]!) + '/')),
+    )
 }
 export function latestRelease(releases: Release[]) {
   return releases.find((release) => !release.prerelease) || releases[0]
@@ -119,9 +132,10 @@ export function discoverReleases(
       body: typeof row.body === 'string' ? row.body : '',
       assets,
     }
-    const releases = groups.get(identity.tool) || []
+    const toolId = canonicalToolId(identity.tool)
+    const releases = groups.get(toolId) || []
     releases.push(release)
-    groups.set(identity.tool, releases)
+    groups.set(toolId, releases)
     seen.add(release.id)
   }
   return {

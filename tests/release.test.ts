@@ -14,7 +14,7 @@ test('release requests only accept known tools, version tags and complete immuta
     tag: 'v1.2.0-rc.10',
     sha: 'a'.repeat(40),
   })
-  expect(request.releaseTag).toBe('df-assembly-tool/v1.2.0-rc.10')
+  expect(request.releaseTag).toBe('g-wolf-toolkit/v1.2.0-rc.10')
   expect(request.sourceRepository).toBe('Loudomian/df-assembly-tool')
   for (const input of [
     { tool: 'unknown', tag: 'v1.0.0' },
@@ -24,6 +24,14 @@ test('release requests only accept known tools, version tags and complete immuta
     { tool: 'df-assembly-tool', tag: 'v1.0.0', sha: 'HEAD' },
   ])
     expect(() => releaseRequest(input)).toThrow()
+})
+
+test('legacy build notifications resolve to the canonical tool and release prefix', () => {
+  for (const tool of ['g-wolf-toolkit', 'df-assembly-tool']) {
+    const request = releaseRequest({ tool, tag: 'v0.1.20' })
+    expect(request.tool).toBe('g-wolf-toolkit')
+    expect(request.releaseTag).toBe('g-wolf-toolkit/v0.1.20')
+  }
 })
 
 test('build requests select a registered runner and exact artifact paths, never arbitrary upload globs', () => {

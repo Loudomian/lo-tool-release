@@ -15,7 +15,11 @@ export function releaseRequest(
   input: { tool?: unknown; tag?: unknown; sha?: unknown },
   registry: BuildTool[] = tools,
 ): ReleaseRequest {
-  const tool = registry.find((tool) => tool.id === input.tool)
+  const matches = registry.filter(
+    (tool) =>
+      tool.id === input.tool || tool.aliases?.includes(String(input.tool)),
+  )
+  const tool = matches.length === 1 ? matches[0] : undefined
   if (!tool || !tool.build.enabled)
     throw new Error('工具尚未登记可执行的发布工作流')
   if (
