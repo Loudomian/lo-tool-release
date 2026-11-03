@@ -1,0 +1,50 @@
+---
+import { usagePolicy } from '../lib/legal'
+import { href } from '../lib/site'
+const page = href(`legal/g-wolf-toolkit/${usagePolicy.version}/`)
+---
+
+<dialog
+  id="usage-notice"
+  class="usage-notice"
+  aria-labelledby="usage-title"
+  aria-describedby="usage-description"
+>
+  <form method="dialog">
+    <h2 id="usage-title">下载前，请阅读使用约定</h2>
+    <p id="usage-description" class="usage-description">
+      本次下载适用《绿狼工具箱使用与署名约定》，版本 {usagePolicy.version}。
+    </p>
+    <ul class="usage-summary">
+      {usagePolicy.summary.map((line) => (
+        <li>{line}</li>
+      ))}
+    </ul>
+    <div class="usage-links">
+      <a href={page + '#terms'} target="_blank" rel="noopener noreferrer">
+        使用与署名约定 ↗
+      </a>
+      <a href={page + '#copyright'} target="_blank" rel="noopener noreferrer">
+        版权声明与投诉 ↗
+      </a>
+    </div>
+    <label class="usage-check">
+      <input id="usage-consent" type="checkbox" />
+      <span>我已阅读并同意上述使用与署名约定</span>
+    </label>
+    <div class="usage-actions">
+      <button id="usage-cancel" value="cancel" type="submit">
+        取消
+      </button>
+      <button id="usage-download" class="usage-confirm" type="button" disabled>
+        同意并下载
+      </button>
+    </div>
+  </form>
+</dialog>
+
+<script>
+  import { initUsageNotice } from '../scripts/usage-notice'
+  const dispose = initUsageNotice()
+  if (import.meta.hot) import.meta.hot.dispose(dispose)
+</script>

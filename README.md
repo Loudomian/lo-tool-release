@@ -23,6 +23,12 @@ bun run preview   # Preview the build locally
 
 Build output: `dist/`. Use `bun run build` to build without running checks.
 
+## G-Wolf Toolkit usage notice
+
+Tool package downloads show a versioned usage and attribution notice. Confirmation is remembered locally for the exact policy version and text; checksum files and other tools do not use this notice. The application's first-use confirmation is independent, so direct GitHub downloads remain covered by the application's own prompt.
+
+The source of the text is the tool repository's `legal/` folder. To sync a new agreement version locally, run `bun scripts/sync-gwolf-legal.ts <path-to-g-wolf-toolkit/legal>`. Commit the generated snapshot and `current.json` together. Existing version snapshots cannot be overwritten with different text; bump the policy version before changing terms. The site builds these snapshots without a runtime dependency on the source repository or GitHub availability.
+
 ## Releases
 
 Publish releases with tags such as `tool-name/v1.0.0`. The site automatically groups releases by tool and lists their download assets.

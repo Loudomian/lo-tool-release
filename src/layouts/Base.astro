@@ -3,6 +3,7 @@ import '../styles/global.css'
 import { href } from '../lib/site'
 import { hubRepository } from '../lib/catalog'
 import Icon from '../components/Icon.astro'
+import { usagePolicy } from '../lib/legal'
 interface Props {
   title?: string
   description?: string
@@ -55,6 +56,9 @@ const {
           © <span data-current-year>{new Date().getFullYear()}</span> Loudomian
         </p>
         <nav class="footer-links" aria-label="页脚链接">
+          <a href={href(`legal/g-wolf-toolkit/${usagePolicy.version}/`)}>
+            绿狼工具箱使用与版权
+          </a>
           <a
             href={`https://github.com/${hubRepository}/releases`}
             target="_blank"

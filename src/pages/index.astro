@@ -1,6 +1,7 @@
 ---
 import Base from '../layouts/Base.astro'
 import Icon from '../components/Icon.astro'
+import UsageNotice from '../components/UsageNotice.astro'
 import { catalog, displayTools, hubRepository } from '../lib/catalog'
 import { renderTools } from '../lib/release-view'
 const entries = displayTools(catalog)
@@ -70,6 +71,7 @@ const entries = displayTools(catalog)
       GitHub Releases <Icon name="external" size={16} />
     </a>
   </section>
+  <UsageNotice />
 </Base>
 
 <script>

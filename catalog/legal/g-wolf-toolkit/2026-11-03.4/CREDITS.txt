@@ -1,0 +1,9 @@
+G-Wolf Toolkit @Loudomian
+协议版本：2026-11-03.4
+
+游戏：《三角洲行动》（Delta Force）
+研发：腾讯天美工作室群琳琅团队（Team Jade / TiMi Studio Group）
+游戏资产及商标归腾讯及各自权利人所有，具体以对应游戏官方声明为准。
+
+公开作品请保留首行工具署名；分享或交付资源包请保留本文件及随附协议和许可。
+使用与署名要求见 TERMS.md，权利归属及联系见 COPYRIGHT.md，组件许可见 THIRD_PARTY_NOTICES.md。

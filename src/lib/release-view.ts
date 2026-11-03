@@ -8,6 +8,7 @@ import {
   type ReleaseAsset,
   type Snapshot,
 } from './catalog'
+import { usageNoticeApplies } from './legal'
 
 // Release titles, notes and filenames are untrusted text. This single escaped
 // renderer is shared by static HTML and live updates; never render raw Markdown.
@@ -23,21 +24,21 @@ const external = 'target="_blank" rel="noopener noreferrer"'
 const arrow =
   '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M12 3v12m-5-5 5 5 5-5M4 16v5h16v-5"/></svg>'
 
-function files(assets: ReleaseAsset[], primary = false) {
+function files(assets: ReleaseAsset[], primary = false, tool = '') {
   return assets
     .map(
       (
         asset,
-      ) => `<a class="download-file${primary ? ' primary-download' : ''}" title="${escape(asset.name)}" href="${escape(asset.url)}" ${external}>
+      ) => `<a class="download-file${primary ? ' primary-download' : ''}" ${usageNoticeApplies(tool, primary) ? 'data-usage-notice' : ''} title="${escape(asset.name)}" href="${escape(asset.url)}" ${external}>
     <span class="file-info"><span>${primary && platformLabel(asset.name) !== '下载文件' ? '下载 ' : ''}${escape(platformLabel(asset.name))}</span><span class="filename">${escape(asset.name)}</span></span>
     <span class="file-size">${formatSize(asset.size)}</span>${arrow}</a>`,
     )
     .join('')
 }
-function downloads(release: Release) {
+function downloads(release: Release, tool: string) {
   const main = release.assets.filter((asset) => !isSupportAsset(asset))
   const support = release.assets.filter(isSupportAsset)
-  return `${main.length ? files(main, true) : '<p class="no-files">此版本未提供下载附件。</p>'}
+  return `${main.length ? files(main, true, tool) : '<p class="no-files">此版本未提供下载附件。</p>'}
     ${support.length ? `<details class="support-files"><summary>校验与发布清单</summary>${files(support)}</details>` : ''}`
 }
 export function renderTools(data: Snapshot) {
@@ -58,7 +59,7 @@ export function renderTools(data: Snapshot) {
           ${platforms ? `<div><dt>平台</dt><dd>${escape(platforms)}</dd></div>` : ''}
         </dl>
       </div>
-      <div class="tool-downloads">${downloads(tool.release)}
+      <div class="tool-downloads">${downloads(tool.release, tool.id)}
         <a class="text-link release-notes" href="${escape(tool.release.url)}" ${external}>版本说明 ↗</a>
       </div>
     </article>`
